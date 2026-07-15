@@ -2,24 +2,42 @@
 
 import { FormEvent, useState } from "react";
 import { ArrowRight, Link2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { transcribeYoutubeVideo } from "@/features/transcription/dal/mutations";
 
 export function HeroForm() {
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState("");
+  const [transcript, setTranscript] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    try {
-      const parsedUrl = new URL(url);
-      const isYoutube = parsedUrl.hostname === "youtu.be" || parsedUrl.hostname.endsWith("youtube.com");
+    setIsLoading(true);
+    setMessage("");
+    setTranscript("");
 
-      setMessage(isYoutube ? "A linket fogadtuk — hamarosan indulhat a fordítás." : "Kérjük, adj meg egy érvényes YouTube-linket.");
-    } catch {
-      setMessage("Kérjük, adj meg egy érvényes YouTube-linket.");
+    const result = await transcribeYoutubeVideo(url);
+    setIsLoading(false);
+
+    if (!result.success) {
+      const message = result.error.type === "zod-input-error"
+        ? "Kérjük, adj meg egy érvényes YouTube-videó linket."
+        : result.error.type === "transcription-error"
+          ? "A videó feldolgozása sikertelen. Ellenőrizd a szerver beállításait."
+          : "A videó feldolgozása sikertelen.";
+      setMessage(message);
+      toast.error(message);
+      return;
     }
+
+    setMessage("A leirat elkészült.");
+    setTranscript(result.data);
+    toast.success("A YouTube-videó leirata elkészült.");
+    console.log("YouTube transcription:", result.data);
   }
 
   return (
@@ -37,12 +55,13 @@ export function HeroForm() {
               type="url"
             />
           </div>
-          <Button type="submit" className="h-12 rounded-xl bg-white px-5 text-sm font-semibold text-[#0b0c11] hover:bg-[#e9e4ff]">
-            Fordítás indítása <ArrowRight className="size-4" />
+          <Button type="submit" disabled={isLoading} className="h-12 rounded-xl bg-white px-5 text-sm font-semibold text-[#0b0c11] hover:bg-[#e9e4ff]">
+            {isLoading ? "Feldolgozás..." : "Fordítás indítása"} {!isLoading && <ArrowRight className="size-4" />}
           </Button>
         </div>
       </form>
-      <p role="status" className={`mt-3 min-h-5 text-xs ${message.includes("fogadtuk") ? "text-[#54e3b4]" : "text-[#ff9da8]"}`}>{message}</p>
+      <p role="status" className={`mt-3 min-h-5 text-xs ${message.includes("elkészült") ? "text-[#54e3b4]" : "text-[#ff9da8]"}`}>{message}</p>
+      {transcript && <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 text-left text-sm leading-6 text-white/70">{transcript}</p>}
     </div>
   );
 }
