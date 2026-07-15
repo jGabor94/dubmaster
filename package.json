@@ -11,6 +11,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^4.0.15",
     "@base-ui/react": "^1.6.0",
+    "@supabase/supabase-js": "^2.110.6",
     "@types/bcrypt": "^6.0.0",
     "ai": "^7.0.28",
     "bcrypt": "^6.0.0",

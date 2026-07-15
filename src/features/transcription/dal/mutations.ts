@@ -9,8 +9,11 @@ import { openai } from "@ai-sdk/openai";
 import { generateSpeech, generateText, transcribe } from "ai";
 import { z } from "zod";
 
+import { createDubbing } from "@/features/dubbing/drizzle/operations";
+import { auth } from "@/features/authentication/lib/auth";
 import { Dal } from "@/lib/dal";
 import { createErrorReturn, createSuccessReturn } from "@/lib/dal/types";
+import { getSupabaseAdmin, SUPABASE_AUDIO_BUCKET } from "@/lib/supabase/server";
 
 const youtubeUrlSchema = z
   .string()
@@ -79,6 +82,11 @@ export const dubYoutubeVideo = Dal.create({ cache: false })
     const outputDirectory = await mkdtemp(join(tmpdir(), "dubmaster-"));
 
     try {
+      const session = await auth();
+      if (!session?.user?.id) {
+        return createErrorReturn({ type: "unauthenticated" });
+      }
+
       await runYtDlp(url, outputDirectory);
       const files = await readdir(outputDirectory);
       const audioFileName = files.find((file) => file.startsWith("audio."));
@@ -109,10 +117,26 @@ export const dubYoutubeVideo = Dal.create({ cache: false })
         instructions: "Speak naturally in Hungarian with clear pronunciation and a calm, professional documentary voice.",
       });
 
-      console.log("Hungarian dubbing audio generated.");
-      return createSuccessReturn({
-        audioUrl: `data:${speech.audio.mediaType};base64,${speech.audio.base64}`,
+      const storagePath = `${session.user.id}/${crypto.randomUUID()}.mp3`;
+      const supabase = getSupabaseAdmin();
+      const { error: uploadError } = await supabase.storage
+        .from(SUPABASE_AUDIO_BUCKET)
+        .upload(storagePath, Buffer.from(speech.audio.uint8Array), {
+          contentType: speech.audio.mediaType,
+          upsert: false,
+        });
+
+      if (uploadError) throw uploadError;
+
+      await createDubbing({
+        userId: session.user.id,
+        sourceUrl: url,
+        storagePath,
+        mimeType: speech.audio.mediaType,
       });
+
+      console.log("Hungarian dubbing audio stored.");
+      return createSuccessReturn({ stored: true });
     } catch (error) {
       console.error("YouTube transcription failed:", error);
       return createErrorReturn({ type: "transcription-error" });

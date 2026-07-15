@@ -1,5 +1,7 @@
 import { AudioLines, LockKeyhole, Sparkles } from "lucide-react";
+import Link from "next/link";
 
+import { AuthControls } from "@/components/auth/auth-controls";
 import { HeroForm } from "@/components/home/hero-form";
 
 export default function Home() {
@@ -15,9 +17,13 @@ export default function Home() {
           </span>
           <span className="text-[15px] font-semibold tracking-[-0.02em]">dubmaster<span className="text-[#9e85ff]">.</span></span>
         </a>
-        <span className="flex items-center gap-2 text-xs text-white/40">
-          <LockKeyhole className="size-3.5 text-[#54e3b4]" /> Privát béta
-        </span>
+        <nav className="flex items-center gap-5 text-xs text-white/40">
+          <Link href="/history" className="transition-colors hover:text-white">Előzmények</Link>
+          <AuthControls />
+          <span className="flex items-center gap-2">
+            <LockKeyhole className="size-3.5 text-[#54e3b4]" /> Privát béta
+          </span>
+        </nav>
       </header>
 
       <section id="top" className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-center px-6 pb-28 pt-24 text-center sm:pt-36">
