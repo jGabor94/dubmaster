@@ -11,14 +11,12 @@ import { dubYoutubeVideo } from "@/features/transcription/dal/mutations";
 export function HeroForm() {
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState("");
-  const [audioUrl, setAudioUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
     setMessage("");
-    setAudioUrl("");
 
     const result = await dubYoutubeVideo(url);
     setIsLoading(false);
@@ -26,6 +24,8 @@ export function HeroForm() {
     if (!result.success) {
       const message = result.error.type === "zod-input-error"
         ? "Kérjük, adj meg egy érvényes YouTube-videó linket."
+        : result.error.type === "unauthenticated"
+          ? "A mentéshez be kell jelentkezned."
         : result.error.type === "transcription-error"
           ? "A videó feldolgozása sikertelen. Ellenőrizd a szerver beállításait."
           : "A videó feldolgozása sikertelen.";
@@ -35,7 +35,6 @@ export function HeroForm() {
     }
 
     setMessage("A magyar hang elkészült.");
-    setAudioUrl(result.data.audioUrl);
     toast.success("A magyar szinkron elkészült.");
   }
 
@@ -72,7 +71,6 @@ export function HeroForm() {
         </div>
       )}
       <p role="status" className={`mt-3 min-h-5 text-xs ${message.includes("elkészült") ? "text-[#54e3b4]" : "text-[#ff9da8]"}`}>{message}</p>
-      {audioUrl && <audio className="mt-4 w-full" controls src={audioUrl} />}
     </div>
   );
 }
