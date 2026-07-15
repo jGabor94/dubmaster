@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { spawn } from "node:child_process";
 
 import { openai } from "@ai-sdk/openai";
-import { transcribe } from "ai";
+import { generateSpeech, generateText, transcribe } from "ai";
 import { z } from "zod";
 
 import { Dal } from "@/lib/dal";
@@ -72,7 +72,7 @@ function runYtDlp(url: string, outputDirectory: string) {
   });
 }
 
-export const transcribeYoutubeVideo = Dal.create({ cache: false })
+export const dubYoutubeVideo = Dal.create({ cache: false })
   .$Input<[string]>()
   .schema({ input: z.tuple([youtubeUrlSchema]) })
   .operation(async ({ input: [url] }) => {
@@ -93,8 +93,26 @@ export const transcribeYoutubeVideo = Dal.create({ cache: false })
         audio,
       });
 
-      console.log("YouTube transcription:", result.text);
-      return createSuccessReturn(result.text);
+      const translation = await generateText({
+        model: openai("gpt-4o-mini"),
+        system:
+          "You are a professional Hungarian audiovisual translator. Translate the transcript into natural, fluent Hungarian suitable for voice-over. Preserve the meaning, tone, names, and paragraph structure. Return only the translated Hungarian text, without explanations or quotation marks.",
+        prompt: result.text,
+      });
+
+      const speech = await generateSpeech({
+        model: openai.speech("gpt-4o-mini-tts"),
+        text: translation.text,
+        voice: "alloy",
+        language: "hu",
+        outputFormat: "mp3",
+        instructions: "Speak naturally in Hungarian with clear pronunciation and a calm, professional documentary voice.",
+      });
+
+      console.log("Hungarian dubbing audio generated.");
+      return createSuccessReturn({
+        audioUrl: `data:${speech.audio.mediaType};base64,${speech.audio.base64}`,
+      });
     } catch (error) {
       console.error("YouTube transcription failed:", error);
       return createErrorReturn({ type: "transcription-error" });
