@@ -1,42 +1,67 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ArrowRight, Link2, LoaderCircle } from "lucide-react";
+import useSWR from "swr";
 import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getDubbingStatus } from "@/features/dubbing/dal/queries";
 import { dubYoutubeVideo } from "@/features/transcription/dal/mutations";
 
 export function HeroForm() {
   const [url, setUrl] = useState("");
-  const [message, setMessage] = useState("");
+  const [dubbingId, setDubbingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { data: statusResult } = useSWR(
+    dubbingId,
+    () => getDubbingStatus(dubbingId!),
+    {
+      refreshInterval: (latestResult) => {
+        if (!latestResult?.success) return 3000;
+        return latestResult.data.status === "completed" || latestResult.data.status === "failed" ? 0 : 3000;
+      },
+    },
+  );
+
+  useEffect(() => {
+    if (!statusResult?.success) return;
+
+    if (statusResult.data.status === "completed") {
+      setIsLoading(false);
+      toast.success("A magyar szinkron elkészült.");
+    } else if (statusResult.data.status === "failed") {
+      setIsLoading(false);
+      toast.error("A videó feldolgozása sikertelen.");
+    }
+  }, [statusResult]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
-    setMessage("");
+    setDubbingId(null);
 
     const result = await dubYoutubeVideo(url);
-    setIsLoading(false);
 
     if (!result.success) {
-      const message = result.error.type === "zod-input-error"
+      setIsLoading(false);
+      const errorMessage = result.error.type === "zod-input-error"
         ? "Kérjük, adj meg egy érvényes YouTube-videó linket."
         : result.error.type === "unauthenticated"
           ? "A mentéshez be kell jelentkezned."
-        : result.error.type === "transcription-error"
-          ? "A videó feldolgozása sikertelen. Ellenőrizd a szerver beállításait."
-          : "A videó feldolgozása sikertelen.";
-      setMessage(message);
-      toast.error(message);
+          : result.error.type === "worker-unavailable"
+            ? "A feldolgozó szerver jelenleg nem érhető el."
+            : "A videó feldolgozása sikertelen.";
+      toast.error(errorMessage);
       return;
     }
 
-    setMessage("A magyar hang elkészült.");
-    toast.success("A magyar szinkron elkészült.");
+    setDubbingId(result.data.dubbingId);
+    toast.success("A videó bekerült a feldolgozási sorba.");
   }
+
+  const isCompleted = statusResult?.success && statusResult.data.status === "completed";
 
   return (
     <div id="start" className="mt-12 w-full max-w-2xl">
@@ -48,7 +73,7 @@ export function HeroForm() {
               aria-label="YouTube videó linkje"
               value={url}
               disabled={isLoading}
-              onChange={(event) => { setUrl(event.target.value); setMessage(""); }}
+              onChange={(event) => { setUrl(event.target.value); }}
               placeholder="Illeszd be a YouTube-linket..."
               className="h-auto min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm text-white shadow-none outline-none placeholder:text-white/30 focus-visible:ring-0"
               type="url"
@@ -63,14 +88,16 @@ export function HeroForm() {
         <div className="mt-4 overflow-hidden rounded-xl border border-[#9e85ff]/25 bg-[#9e85ff]/[0.08] px-4 py-3 text-left" role="status" aria-live="polite">
           <div className="flex items-center gap-3 text-xs text-white/70">
             <LoaderCircle className="size-4 shrink-0 animate-spin text-[#b7a1ff]" />
-            <span>Letöltjük a videót, lefordítjuk, majd elkészítjük a magyar hangot...</span>
+            <span>A worker feldolgozza a videót. Az oldal automatikusan frissül, amikor elkészül a hang.</span>
           </div>
           <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/10">
             <div className="h-full w-1/3 animate-[progress_1.5s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-[#9e85ff] to-[#5fd8d6]" />
           </div>
         </div>
       )}
-      <p role="status" className={`mt-3 min-h-5 text-xs ${message.includes("elkészült") ? "text-[#54e3b4]" : "text-[#ff9da8]"}`}>{message}</p>
+      {isCompleted && statusResult.data.audioUrl && (
+        <audio className="mt-4 w-full" controls src={statusResult.data.audioUrl} />
+      )}
     </div>
   );
 }

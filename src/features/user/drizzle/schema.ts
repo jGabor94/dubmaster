@@ -1,45 +1,35 @@
-import { createdAt, updatedAt } from "@/drizzle/schemaTypes";
-import { Role } from "@/features/authorization/types";
-import { integer, pgTable, primaryKey, text, timestamp, varchar } from "drizzle-orm/pg-core";
-import { AdapterAccountType } from "next-auth/adapters";
+import { sql } from "drizzle-orm";
+import { integer, pgTable, primaryKey, text, timestamp, unique, varchar } from "drizzle-orm/pg-core";
 
-export const usersTable = pgTable("users", {
-    id: text("id")
-        .primaryKey()
-        .$defaultFn(() => crypto.randomUUID()),
-    username: varchar('username', { length: 100 }).notNull(),
-    password: varchar('password', { length: 100 }).notNull().default(''),
-    email: varchar('email', { length: 100 }).unique().notNull(),
-    name: varchar('name', { length: 100 }).default(''),
-    emailVerified: timestamp("emailVerified", { mode: "date" }),
-    roles: varchar('roles', { length: 100 }).array().$type<Role>(),
-    image: varchar('image', { length: 255 }).default('').notNull(),
-    theme: varchar('theme', { enum: ["light", "dark"] }).default('light').notNull(),
-    createdAt,
-    updatedAt,
-});
+export const usersTable = pgTable.withRLS("users", {
+    id: text().primaryKey(),
+    username: varchar({ length: 100 }).notNull(),
+    password: varchar({ length: 100 }).default("").notNull(),
+    email: varchar({ length: 100 }).notNull(),
+    name: varchar({ length: 100 }).default(""),
+    emailVerified: timestamp(),
+    roles: varchar({ length: 100 }).array(),
+    image: varchar({ length: 255 }).default("").notNull(),
+    theme: varchar().default("light").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`).notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+    unique("users_email_key").on(table.email),]);
 
 
-export const accountsTable = pgTable("account", {
-    userId: text("userId")
-        .notNull()
-        .references(() => usersTable.id, { onDelete: "cascade" }),
-    type: text("type").$type<AdapterAccountType>().notNull(),
-    provider: text("provider").notNull(),
-    providerAccountId: text("providerAccountId").notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: text("token_type"),
-    scope: text("scope"),
-    id_token: text("id_token"),
-    session_state: text("session_state"),
-},
-    (account) => ({
-        compoundKey: primaryKey({
-            columns: [account.provider, account.providerAccountId],
-        }),
-    })
-)
-
+export const accountsTable = pgTable.withRLS("account", {
+    userId: text().notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+    type: text().notNull(),
+    provider: text().notNull(),
+    providerAccountId: text().notNull(),
+    refreshToken: text("refresh_token"),
+    accessToken: text("access_token"),
+    expiresAt: integer("expires_at"),
+    tokenType: text("token_type"),
+    scope: text(),
+    idToken: text("id_token"),
+    sessionState: text("session_state"),
+}, (table) => [
+    primaryKey({ columns: [table.provider, table.providerAccountId], name: "account_pkey" }),
+]);
 
