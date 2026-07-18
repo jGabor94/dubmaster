@@ -12,7 +12,6 @@ import { dubYoutubeVideo } from "@/features/transcription/dal/mutations";
 
 export function HeroForm() {
   const [url, setUrl] = useState("");
-  const [message, setMessage] = useState("");
   const [dubbingId, setDubbingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { data: statusResult } = useSWR(
@@ -31,11 +30,9 @@ export function HeroForm() {
 
     if (statusResult.data.status === "completed") {
       setIsLoading(false);
-      setMessage("A magyar hang elkészült.");
       toast.success("A magyar szinkron elkészült.");
     } else if (statusResult.data.status === "failed") {
       setIsLoading(false);
-      setMessage("A videó feldolgozása sikertelen.");
       toast.error("A videó feldolgozása sikertelen.");
     }
   }, [statusResult]);
@@ -43,7 +40,6 @@ export function HeroForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
-    setMessage("");
     setDubbingId(null);
 
     const result = await dubYoutubeVideo(url);
@@ -57,13 +53,11 @@ export function HeroForm() {
           : result.error.type === "worker-unavailable"
             ? "A feldolgozó szerver jelenleg nem érhető el."
             : "A videó feldolgozása sikertelen.";
-      setMessage(errorMessage);
       toast.error(errorMessage);
       return;
     }
 
     setDubbingId(result.data.dubbingId);
-    setMessage("A videó feldolgozása elindult.");
     toast.success("A videó bekerült a feldolgozási sorba.");
   }
 
@@ -79,7 +73,7 @@ export function HeroForm() {
               aria-label="YouTube videó linkje"
               value={url}
               disabled={isLoading}
-              onChange={(event) => { setUrl(event.target.value); setMessage(""); }}
+              onChange={(event) => { setUrl(event.target.value); }}
               placeholder="Illeszd be a YouTube-linket..."
               className="h-auto min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-sm text-white shadow-none outline-none placeholder:text-white/30 focus-visible:ring-0"
               type="url"
@@ -104,7 +98,6 @@ export function HeroForm() {
       {isCompleted && statusResult.data.audioUrl && (
         <audio className="mt-4 w-full" controls src={statusResult.data.audioUrl} />
       )}
-      <p role="status" className={`mt-3 min-h-5 text-xs ${isCompleted ? "text-[#54e3b4]" : "text-[#ff9da8]"}`}>{message}</p>
     </div>
   );
 }
