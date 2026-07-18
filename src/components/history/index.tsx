@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, LoaderCircle } from "lucide-react";
 import { useRef } from "react";
 import useSWR from "swr";
 
@@ -48,7 +48,7 @@ export function HistoryList({ initialHistory }: { initialHistory: DubbingHistory
               Megnyitás <ExternalLink className="size-3.5" />
             </a>
           )}
-          {dubbing.audioUrl ? <audio className="mt-4 w-full" controls src={dubbing.audioUrl} /> : <p className={`mt-4 text-xs ${dubbing.status === "failed" ? "text-[#ff9da8]" : "text-white/45"}`}>{dubbing.status === "failed" ? "A feldolgozás sikertelen." : `Feldolgozás alatt (${dubbing.status})...`}</p>}
+          {dubbing.audioUrl ? <audio className="mt-4 w-full" controls src={dubbing.audioUrl} /> : dubbing.status === "failed" ? <p className="mt-4 text-xs text-[#ff9da8]">A feldolgozás sikertelen.</p> : <div className="mt-4 inline-flex items-center gap-2 text-xs text-white/45" role="status" aria-live="polite"><LoaderCircle className="size-3.5 animate-spin text-[#b7a1ff]" /><span>Feldolgozás alatt ({dubbing.status})...</span></div>}
         </article>
       ))}
     </div>
