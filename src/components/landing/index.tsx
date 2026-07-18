@@ -24,7 +24,7 @@ export function LandingPage() {
           {features.map(([Icon, title, description]) => <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.045] p-5 backdrop-blur-xl"><Icon className="size-5 text-[#b7a1ff]" /><p className="mt-4 text-sm font-medium text-white/85">{title}</p><p className="mt-2 text-xs leading-5 text-white/40">{description}</p></div>)}
         </div>
       </section>
-      <footer className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between border-t border-white/[0.08] px-6 py-6 text-xs text-white/25 lg:px-10"><span>© 2026 dubmaster</span><span>Privát használatra</span></footer>
+      <footer className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-2 border-t border-white/[0.08] px-6 py-6 text-xs text-white/25 sm:flex-row sm:items-center sm:justify-between lg:px-10"><span>© 2026 dubmaster</span><span>Tulajdonos és készítő: Jakucs Gábor · jakucs.gabor94@gmail.com</span></footer>
     </main>
   );
 }

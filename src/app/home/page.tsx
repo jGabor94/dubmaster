@@ -16,7 +16,7 @@ export default function Home() {
         <HeroForm />
         <p className="mt-5 text-xs text-white/30">A béta jelenleg csak szűk körben érhető el.</p>
       </section>
-      <footer className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between border-t border-white/[0.08] px-6 py-6 text-xs text-white/25 lg:px-10"><span>© 2026 dubmaster</span><span>Privát használatra</span></footer>
+      <footer className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-2 border-t border-white/[0.08] px-6 py-6 text-xs text-white/25 sm:flex-row sm:items-center sm:justify-between lg:px-10"><span>© 2026 dubmaster</span><span>Tulajdonos és készítő: Jakucs Gábor · jakucs.gabor94@gmail.com</span></footer>
     </main>
   );
 }
