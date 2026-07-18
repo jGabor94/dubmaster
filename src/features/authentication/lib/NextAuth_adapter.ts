@@ -9,6 +9,7 @@ export const customAdapter: Adapter = {
     async createUser(user) {
         const username = extractUsername(user.email as Email)
         const [createdUser] = await db.insert(usersTable).values({
+            id: user.id,
             username: username,
             email: user.email,
             name: user.name || "",
