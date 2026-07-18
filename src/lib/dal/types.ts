@@ -46,7 +46,7 @@ export type DalErrorReturn<TError extends DalError = DalError> = {
     readonly error: TError
 }
 
-export type DalSuccessReturn<Tdata extends any = unknown> = {
+export type DalSuccessReturn<Tdata = unknown> = {
     success: true
     data: Tdata
 }
@@ -61,7 +61,7 @@ export type DalSchema = {
 }
 
 
-export function createSuccessReturn<const T extends any = undefined>(data?: T): DalSuccessReturn<T> {
+export function createSuccessReturn<const T = undefined>(data?: T): DalSuccessReturn<T> {
     return { success: true, data: data as T }
 }
 

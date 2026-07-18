@@ -29,6 +29,7 @@ export const customAdapter: Adapter = {
     },
     async getUserByEmail(email) {
         const { password, ...userColumns } = getTableColumns(usersTable)
+        void password
         const [user] = await db.select(userColumns).from(usersTable).where(eq(usersTable.email, email.toLowerCase()))
 
         if (user) return user
@@ -44,6 +45,7 @@ export const customAdapter: Adapter = {
         if (!account) return null;
 
         const { password, ...userColumns } = getTableColumns(usersTable)
+        void password
         const [user] = await db.select(userColumns).from(usersTable).where(eq(usersTable.id, account.userId))
 
         if (user) return user
