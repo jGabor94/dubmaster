@@ -16,7 +16,7 @@ interface TokenUserData {
 
 declare module "next-auth" {
     interface Session extends DefaultSession { user: TokenUserData }
-    interface User extends Omit<SelectUser, "password"> { }
+    interface User extends Omit<SelectUser, "password"> { id: string }
 }
 
 declare module "next-auth/jwt" {

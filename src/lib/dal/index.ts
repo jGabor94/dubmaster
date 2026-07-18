@@ -21,18 +21,18 @@ import { AuthenticationError, AuthorizationError, createErrorReturn, createSucce
  * @template O - Optional Zod output schema.
  */
 interface CreateReturn<
-    Returns extends any[] = InitReturns,
+    Returns extends unknown[] = InitReturns,
     Ctx extends AnyObject = AnyObject,
-    I extends any[] = [],
+    I extends unknown[] = [],
     O extends z.ZodType | undefined = undefined
 > {
     operation<const T extends DalErrorReturn | (O extends undefined ? DalSuccessReturn : DalSuccessReturn<z.output<O>>) | void>(fn: (ctx: Ctx) => Promise<T>): (...args: I extends undefined ? [] : I) => Promise<Returns[number] | T>
     authenticate(): AuthenticateReturn<[...Returns, DalErrorReturn<AuthenticationError>], DeepExpand<Ctx & { user: Session["user"] }>, I, O>,
-    schema<TInput extends z.ZodTuple<{ [K in keyof I]: z.ZodType<I[K]> }, any> | undefined = undefined, TOutput extends z.ZodType | undefined = undefined>(schema?: {
+    schema<TInput extends z.ZodTuple<{ [K in keyof I]: z.ZodType<I[K]> }, z.ZodTypeAny | null> | undefined = undefined, TOutput extends z.ZodType | undefined = undefined>(schema?: {
         input?: TInput,
         output?: TOutput
     }): SchemaReturn<[...Returns, TInput extends z.ZodTuple ? DalErrorReturn<ZodInputError> : never, TOutput extends z.ZodType ? DalErrorReturn<ZodOutputError> : never], Ctx, I, TOutput>
-    $Input<TInput extends any[] = []>(): $InputReturn<Returns, DeepExpand<Ctx & { input: TInput }>, TInput, O>
+    $Input<TInput extends unknown[] = []>(): $InputReturn<Returns, DeepExpand<Ctx & { input: TInput }>, TInput, O>
 }
 
 /**
@@ -45,14 +45,14 @@ interface CreateReturn<
  * @template O - Optional Zod output schema.
  */
 interface $InputReturn<
-    Returns extends any[] = InitReturns,
+    Returns extends unknown[] = InitReturns,
     Ctx extends AnyObject = AnyObject,
-    I extends any[] = [],
+    I extends unknown[] = [],
     O extends z.ZodType | undefined = undefined
 > {
     operation<const T extends DalErrorReturn | (O extends undefined ? DalSuccessReturn : DalSuccessReturn<z.output<O>>) | void>(fn: (ctx: Ctx) => Promise<T>): (...args: I extends undefined ? [] : I) => Promise<Returns[number] | T>
     authenticate(): AuthenticateReturn<[...Returns, DalErrorReturn<AuthenticationError>], DeepExpand<Ctx & { user: Session["user"] }>, I, O>,
-    schema<TInput extends z.ZodTuple<{ [K in keyof I]: z.ZodType<I[K]> }, any> | undefined = undefined, TOutput extends z.ZodType | undefined = undefined>(schema?: {
+    schema<TInput extends z.ZodTuple<{ [K in keyof I]: z.ZodType<I[K]> }, z.ZodTypeAny | null> | undefined = undefined, TOutput extends z.ZodType | undefined = undefined>(schema?: {
         input?: TInput,
         output?: TOutput
     }): SchemaReturn<[...Returns, TInput extends z.ZodTuple ? DalErrorReturn<ZodInputError> : never, TOutput extends z.ZodType ? DalErrorReturn<ZodOutputError> : never], Ctx, I, TOutput>
@@ -69,9 +69,9 @@ interface $InputReturn<
  * @template O - Optional Zod output schema.
  */
 interface SchemaReturn<
-    Returns extends any[] = InitReturns,
+    Returns extends unknown[] = InitReturns,
     Ctx extends AnyObject = AnyObject,
-    I extends any[] = [],
+    I extends unknown[] = [],
     O extends z.ZodType | undefined = undefined
 > {
     operation<const T extends DalErrorReturn | (O extends undefined ? DalSuccessReturn : DalSuccessReturn<z.output<O>>) | void>(fn: (ctx: Ctx) => Promise<T>): (...args: I extends undefined ? [] : I) => Promise<Returns[number] | T>
@@ -89,9 +89,9 @@ interface SchemaReturn<
  * @template O - Optional Zod output schema.
  */
 interface AuthenticateReturn<
-    Returns extends any[] = InitReturns,
+    Returns extends unknown[] = InitReturns,
     Ctx extends AnyObject = AnyObject,
-    I extends any[] = [],
+    I extends unknown[] = [],
     O extends z.ZodType | undefined = undefined
 > {
     operation<const T extends DalErrorReturn | (O extends undefined ? DalSuccessReturn : DalSuccessReturn<z.output<O>>) | void>(fn: (ctx: Ctx) => Promise<T>): (...args: I extends undefined ? [] : I) => Promise<Returns[number] | T>
@@ -113,9 +113,9 @@ interface AuthenticateReturn<
  * @template O - Optional Zod output schema.
  */
 interface AuthorizeReturn<
-    Returns extends any[] = InitReturns,
+    Returns extends unknown[] = InitReturns,
     Ctx extends AnyObject = AnyObject,
-    I extends any[] = [],
+    I extends unknown[] = [],
     O extends z.ZodType | undefined = undefined
 > {
     operation<const T extends DalErrorReturn | (O extends undefined ? DalSuccessReturn : DalSuccessReturn<z.output<O>>) | void>(fn: (ctx: Ctx) => Promise<T>): (...args: I extends undefined ? [] : I) => Promise<Returns[number] | T>
@@ -144,17 +144,17 @@ interface AuthorizeReturn<
  *   })
  */
 export class Dal<
-    Returns extends any[] = InitReturns,
-    Ctx extends AnyObject = {},
-    I extends any[] = [],
+    Returns extends unknown[] = InitReturns,
+    Ctx extends AnyObject = AnyObject,
+    I extends unknown[] = [],
     O extends z.ZodType | undefined = undefined
 > {
 
     private authentication = false
     private authorization: {
         resource: keyof Permissions;
-        action: any;
-        data?: any | ((...args: any[]) => Promise<any>);
+        action: Permissions[keyof Permissions]["action"];
+        data?: unknown | ((...args: never[]) => Promise<unknown>);
     } | false = false
 
     private cfg: { cache?: boolean } | undefined = undefined
@@ -182,7 +182,7 @@ export class Dal<
    * @param schema.input - Zod tuple matching the operation's argument list.
    * @param schema.output - Zod type that the success data must satisfy.
    */
-    schema<TInput extends z.ZodTuple<{ [K in keyof I]: z.ZodType<I[K]> }, any> | undefined = undefined, TOutput extends z.ZodType | undefined = undefined>(schema?: {
+    schema<TInput extends z.ZodTuple<{ [K in keyof I]: z.ZodType<I[K]> }, z.ZodTypeAny | null> | undefined = undefined, TOutput extends z.ZodType | undefined = undefined>(schema?: {
         input?: TInput,
         output?: TOutput
     }) {
@@ -202,7 +202,7 @@ export class Dal<
  * Adds `{ input: TInput }` to `Ctx` so the operation receives typed arguments.
  * Use when runtime validation is not needed but type safety is still desired.
  */
-    $Input<TInput extends any[] = []>() {
+    $Input<TInput extends unknown[] = []>() {
         return this as unknown as $InputReturn<
             Returns,
             DeepExpand<Ctx & { input: TInput }>,
@@ -321,7 +321,7 @@ export class Dal<
 
 
             } catch (error) {
-                if ((error as any).message === "NEXT_REDIRECT") throw error;
+                if (error && typeof error === "object" && "message" in error && error.message === "NEXT_REDIRECT") throw error;
                 if (error instanceof DrizzleQueryError) {
                     console.error("Drizzle Query Error:", error)
                     return createErrorReturn({ type: "drizzle-error", error: error })
