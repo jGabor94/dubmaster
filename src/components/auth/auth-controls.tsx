@@ -1,6 +1,6 @@
 import { LogIn, LogOut } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 
 import { auth, signIn, signOut } from "@/features/authentication/lib/auth";
 
@@ -19,7 +19,7 @@ export async function AuthControls({ showGoogleSignIn = false }: { showGoogleSig
     return (
       <form action={async () => {
         "use server";
-        await signIn("google", { redirectTo: "/" });
+        await signIn("google", { redirectTo: "/home" });
       }}>
         <button type="submit" className="inline-flex items-center gap-2 text-xs text-white/60 transition-colors hover:text-white">
           <Image src="/googleButtonLogo.svg" alt="" width={18} height={18} /> Belépés Google-lel
