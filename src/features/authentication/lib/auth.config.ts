@@ -3,13 +3,12 @@ import { NextResponse } from "next/server";
 
 const protectedRoutes = [
     "/home",
-    "/library",
-    "/folders",
+    "/admin",
+    "/history",
     "/sets",
     "/profile",
     "/teach",
-    "/class",
-    "/history",
+    "/class"
 ]
 
 export const authConfig = {

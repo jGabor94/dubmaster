@@ -15,7 +15,11 @@ export type RolesWithPermissions = {
 }
 
 export type Permissions = {
-    changelog: {
+  allowedGoogleEmail: {
+    dataType: never
+    action: "read" | "create" | "delete"
+  },
+  changelog: {
         dataType: never
         action: "create" | "delete"
     },

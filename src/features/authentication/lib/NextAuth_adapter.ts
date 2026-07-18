@@ -4,6 +4,7 @@ import { extractUsername } from "@/features/user/utils";
 import { and, eq, getTableColumns } from "drizzle-orm";
 import { Adapter } from "next-auth/adapters";
 import { Email } from "../types";
+import { isBootstrapAdminEmail } from "../utils";
 
 export const customAdapter: Adapter = {
     async createUser(user) {
@@ -11,9 +12,9 @@ export const customAdapter: Adapter = {
         const [createdUser] = await db.insert(usersTable).values({
             id: user.id,
             username: username,
-            email: user.email,
+            email: user.email.toLowerCase(),
             name: user.name || "",
-            roles: ["user"],
+            roles: isBootstrapAdminEmail(user.email) ? ["admin"] : ["user"],
             image: user.image || "",
             emailVerified: user.emailVerified
         }).returning();
@@ -28,7 +29,7 @@ export const customAdapter: Adapter = {
     },
     async getUserByEmail(email) {
         const { password, ...userColumns } = getTableColumns(usersTable)
-        const [user] = await db.select(userColumns).from(usersTable).where(eq(usersTable.email, email))
+        const [user] = await db.select(userColumns).from(usersTable).where(eq(usersTable.email, email.toLowerCase()))
 
         if (user) return user
         return null
