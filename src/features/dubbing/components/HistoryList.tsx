@@ -2,7 +2,8 @@
 
 import { getDubbingHistory } from "@/features/dubbing/dal/queries";
 import type { DubbingHistory } from "@/features/dubbing/types";
-import { ExternalLink, LoaderCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LoaderCircle } from "lucide-react";
 import { FC, useRef } from "react";
 import useSWR from "swr";
 
@@ -33,19 +34,37 @@ const HistoryList: FC<{ initialHistory: DubbingHistory[] }> = ({ initialHistory 
             {history.map((dubbing) => (
                 <article key={dubbing.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0">
-                            <p className="truncate text-sm text-white/75">{dubbing.sourceUrl}</p>
-                            <p className="mt-2 text-xs text-white/35">{dubbing.createdAt.toLocaleString("hu-HU")}</p>
+                        <div className="flex min-w-0 gap-4">
+                            {dubbing.srcThumbnailUrl ? (
+                                <img
+                                    src={dubbing.srcThumbnailUrl}
+                                    alt={dubbing.srcTitle ?? "YouTube videó bélyegképe"}
+                                    className="aspect-video h-auto w-24 shrink-0 rounded-lg object-cover sm:w-32"
+                                />
+                            ) : (
+                                <Skeleton className="aspect-video h-auto w-24 shrink-0 rounded-lg bg-white/10 sm:w-32" />
+                            )}
+                            <div className="min-w-0">
+                                {dubbing.srcTitle ? (
+                                    <p className="line-clamp-2 text-sm font-medium text-white/90">{dubbing.srcTitle}</p>
+                                ) : (
+                                    <Skeleton className="h-4 w-48 max-w-full bg-white/10" />
+                                )}
+                                <a
+                                    href={dubbing.sourceUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="mt-2 block truncate text-xs text-[#b7a1ff] hover:text-white"
+                                >
+                                    {dubbing.sourceUrl}
+                                </a>
+                                <p className="mt-2 text-xs text-white/35">{dubbing.createdAt.toLocaleString("hu-HU")}</p>
+                            </div>
                         </div>
                         <span className={`inline-flex w-fit shrink-0 rounded-full border px-2.5 py-1 text-xs ${dubbing.status === "completed" ? "border-[#54e3b4]/25 bg-[#54e3b4]/10 text-[#54e3b4]" : dubbing.status === "failed" ? "border-[#ff9da8]/25 bg-[#ff9da8]/10 text-[#ff9da8]" : "border-[#b7a1ff]/25 bg-[#b7a1ff]/10 text-[#cbbdff]"}`}>
                             {dubbing.status}
                         </span>
                     </div>
-                    {dubbing.audioUrl && (
-                        <a href={dubbing.audioUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-xs text-[#b7a1ff] hover:text-white">
-                            Megnyitás <ExternalLink className="size-3.5" />
-                        </a>
-                    )}
                     {dubbing.audioUrl ? <audio className="mt-4 w-full" controls src={dubbing.audioUrl} /> : dubbing.status === "failed" ? <p className="mt-4 text-xs text-[#ff9da8]">A feldolgozás sikertelen.</p> : <div className="mt-4 inline-flex items-center gap-2 text-xs text-white/45" role="status" aria-live="polite"><LoaderCircle className="size-3.5 animate-spin text-[#b7a1ff]" /><span>Feldolgozás alatt ({dubbing.status})...</span></div>}
                 </article>
             ))}
