@@ -7,6 +7,8 @@ export const dubbingsTable = pgTable.withRLS("dubbings", {
   id: text().primaryKey(),
   userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   sourceUrl: text("source_url").notNull(),
+  srcThumbnailUrl: text("src_thumbnail_url"),
+  srcTitle: text("src_title"),
   storagePath: text("storage_path"),
   mimeType: varchar("mime_type", { length: 100 }).default("audio/mpeg").notNull(),
   status: varchar({ length: 20 }).default("queued").notNull(),
