@@ -23,7 +23,7 @@ features/
     hooks/
     lib/
     utils/
-    types.ts
+    types.ts          # feature mappában minden típus gyűjtőhelye
     providers/
 ```
 
@@ -37,6 +37,17 @@ A `zod/` mappa a `drizzle/`-lal **egy szinten** van, nem az alatt.
 - UI kód vagy route handler **soha ne hívjon közvetlenül** `drizzle/operations`-t.
 - Ne ugorj át réteget, és ne fordítsd meg a hívási irányt.
 
+## Komponensek elhelyezése
+
+- Ha egy komponens **csak egy adott feature-höz** kapcsolódik (pl. csak a `users` feature-ön belül használt lista/form/kártya komponens), az a `features/<feature-name>/components/` alá kerül — **nem** a gyökér `src/components/`-be.
+- A gyökér `src/components/` kizárólag olyan komponenseknek van fenntartva, amelyeket **legalább két különböző feature** használ, vagy amelyek feature-független, generikus UI elemek (pl. layout, navbar, shadcn `ui/` komponensek).
+- Ha bizonytalan vagy, hogy egy komponens globális-e: alapértelmezésben tedd a feature `components/` mappájába, és csak akkor emeld ki a gyökérbe, ha ténylegesen több feature igényli.
+
+## Drizzle séma és típusok
+
+Új Drizzle tábla létrehozásának pontos konvencióját (`withRLS`, névadás, kötelező mezők) és a hozzá tartozó `Insert`/`Select` típusok generálását a **`drizzle-schema` skill** írja le — új séma létrehozásakor/módosításakor mindig azt kövesd.
+A gyökér `drizzle/` mappa a feature mappák `drizzle/schema.ts` fájljaiból importálja össze a globális Drizzle sémakészletet — új sémát mindig a feature `drizzle/schema.ts`-ébe adj hozzá, ne a gyökér `drizzle/` mappába.
+
 ## Zod sémák
 
-A `zod/schema.ts` sémái feature-specifikusak. A gyökér `drizzle/` mappa a feature mappák `drizzle/schema.ts` fájljaiból importálja össze a globális Drizzle sémakészletet — új sémát mindig a feature `drizzle/schema.ts`-ébe adj hozzá, ne a gyökér `drizzle/` mappába.
+A `zod/schema.ts` sémái feature-specifikusak. 

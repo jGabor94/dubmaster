@@ -1,16 +1,16 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
 import { ArrowRight, Link2, LoaderCircle } from "lucide-react";
-import useSWR from "swr";
+import { FC, FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import useSWR from "swr";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getDubbingStatus } from "@/features/dubbing/dal/queries";
 import { dubYoutubeVideo } from "@/features/transcription/dal/mutations";
 
-export function HeroForm() {
+const HeroForm: FC = () => {
   const [url, setUrl] = useState("");
   const [dubbingId, setDubbingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -101,3 +101,5 @@ export function HeroForm() {
     </div>
   );
 }
+
+export default HeroForm;

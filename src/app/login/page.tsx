@@ -1,10 +1,10 @@
+import AuthControls from "@/features/authentication/components/AuthControls";
+import LoginErrorToast from "@/features/authentication/components/LoginErrorToast";
 import { ArrowLeft, AudioLines, LockKeyhole } from "lucide-react";
 import Link from "next/link";
+import { FC } from "react";
 
-import { AuthControls } from "@/components/auth/auth-controls";
-import { LoginErrorToast } from "@/components/auth/login-error-toast";
-
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+const Page: FC<{ searchParams: Promise<{ error?: string }> }> = async ({ searchParams }) => {
   const { error } = await searchParams;
 
   return (
@@ -29,3 +29,5 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     </main>
   );
 }
+
+export default Page;

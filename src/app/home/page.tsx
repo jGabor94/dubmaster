@@ -1,9 +1,9 @@
+import SiteHeader from "@/components/navigation/SiteHeader";
+import HeroForm from "@/features/dubbing/components/HeroForm";
 import { Sparkles } from "lucide-react";
+import { FC } from "react";
 
-import { HeroForm } from "@/components/home/hero-form";
-import { SiteHeader } from "@/components/navigation/site-header";
-
-export default function Home() {
+const Page: FC = () => {
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#08090d] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(124,92,255,0.16),transparent_34%),radial-gradient(circle_at_10%_90%,rgba(37,211,219,0.06),transparent_28%)]" />
@@ -20,3 +20,5 @@ export default function Home() {
     </main>
   );
 }
+
+export default Page;

@@ -1,17 +1,20 @@
-import { LogIn, LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth, signIn, signOut } from "@/features/authentication/lib/auth";
+import { FC } from "react";
 
-export async function AuthControls({ showGoogleSignIn = false }: { showGoogleSignIn?: boolean }) {
+const AuthControls: FC<{ showGoogleSignIn?: boolean }> = async ({ showGoogleSignIn = false }) => {
+
   const session = await auth();
 
   if (!session) {
     if (!showGoogleSignIn) {
       return (
         <Link href="/login" className="inline-flex items-center gap-2 text-xs text-white/60 transition-colors hover:text-white">
-          <LogIn className="size-3.5" /> Belépés
+          <UserRound className="size-3.5" /> Belépés
         </Link>
       );
     }
@@ -30,7 +33,13 @@ export async function AuthControls({ showGoogleSignIn = false }: { showGoogleSig
 
   return (
     <div className="flex items-center gap-3">
-      <span className="hidden max-w-44 truncate text-xs text-white/45 sm:block">{session.user.email}</span>
+      <span className="hidden max-w-44 items-center gap-2 truncate text-xs text-white/45 sm:flex">
+        <Avatar size="sm" className="border border-white/10 bg-white/10 text-white/60">
+          {session.user.image && <AvatarImage src={session.user.image} alt="" />}
+          <AvatarFallback><UserRound className="size-3.5" /></AvatarFallback>
+        </Avatar>
+        <span className="truncate">{session.user.email}</span>
+      </span>
       <form action={async () => {
         "use server";
         await signOut({ redirectTo: "/" });
@@ -42,3 +51,5 @@ export async function AuthControls({ showGoogleSignIn = false }: { showGoogleSig
     </div>
   );
 }
+
+export default AuthControls;

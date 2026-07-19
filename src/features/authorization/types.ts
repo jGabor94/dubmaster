@@ -1,4 +1,5 @@
 import { Session } from "next-auth"
+import { allowedGoogleEmailsTable } from "./drizzle/schema"
 
 export type Role = "admin" | "user"
 
@@ -15,12 +16,15 @@ export type RolesWithPermissions = {
 }
 
 export type Permissions = {
-  allowedGoogleEmail: {
-    dataType: never
-    action: "read" | "create" | "delete"
-  },
-  changelog: {
+    allowedGoogleEmail: {
+        dataType: never
+        action: "read" | "create" | "delete"
+    },
+    changelog: {
         dataType: never
         action: "create" | "delete"
     },
 }
+
+export type InsertAllowedGoogleEmail = typeof allowedGoogleEmailsTable.$inferInsert;
+export type SelectAllowedGoogleEmail = typeof allowedGoogleEmailsTable.$inferSelect;

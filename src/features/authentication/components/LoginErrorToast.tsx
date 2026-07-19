@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { FC, useEffect } from "react";
 import toast from "react-hot-toast";
 
 const errorMessages: Record<string, string> = {
@@ -13,7 +13,8 @@ const errorMessages: Record<string, string> = {
   Verification: "A belépési ellenőrzés sikertelen.",
 };
 
-export function LoginErrorToast({ error }: { error?: string }) {
+const LoginErrorToast: FC<{ error?: string }> = ({ error }) => {
+
   useEffect(() => {
     if (!error) return;
 
@@ -22,3 +23,5 @@ export function LoginErrorToast({ error }: { error?: string }) {
 
   return null;
 }
+
+export default LoginErrorToast;

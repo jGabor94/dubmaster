@@ -1,11 +1,11 @@
+import SiteHeader from "@/components/navigation/SiteHeader";
+import HistoryList from "@/features/dubbing/components/HistoryList";
+import { getDubbingHistory } from "@/features/dubbing/dal/queries";
 import { ArrowLeft, LockKeyhole } from "lucide-react";
 import Link from "next/link";
+import { FC } from "react";
 
-import { HistoryList } from "@/components/history";
-import { SiteHeader } from "@/components/navigation/site-header";
-import { getDubbingHistory } from "@/features/dubbing/dal/queries";
-
-export default async function HistoryPage() {
+const Page: FC = async () => {
   const result = await getDubbingHistory();
 
   if (!result.success) {
@@ -14,3 +14,5 @@ export default async function HistoryPage() {
 
   return <main className="min-h-screen bg-[#08090d] text-white"><SiteHeader active="history" /><section className="mx-auto w-full max-w-4xl px-6 pb-20 pt-16 lg:px-10"><p className="text-xs font-medium uppercase tracking-[0.2em] text-[#9e85ff]">Saját könyvtár</p><h1 className="mt-4 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Előzmények</h1><p className="mt-4 text-base text-white/45">A korábban elkészült magyar szinkronjaid.</p><HistoryList initialHistory={result.data} /></section></main>;
 }
+
+export default Page;

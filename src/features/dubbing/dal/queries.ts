@@ -1,8 +1,9 @@
 "use server";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "@/drizzle/db";
+import { getDubbingHistoryQuery } from "@/features/dubbing/drizzle/operations";
 import { dubbingsTable } from "@/features/dubbing/drizzle/schema";
 import { Dal } from "@/lib/dal";
 import { createErrorReturn, createSuccessReturn } from "@/lib/dal/types";
@@ -36,11 +37,7 @@ export const getDubbingStatus = Dal.create({ cache: false })
 export const getDubbingHistory = Dal.create()
   .authenticate()
   .operation(async ({ user }) => {
-    const dubbings = await db
-      .select()
-      .from(dubbingsTable)
-      .where(eq(dubbingsTable.userId, user.id))
-      .orderBy(desc(dubbingsTable.createdAt));
+    const dubbings = await getDubbingHistoryQuery(user.id);
 
     const supabase = getSupabaseAdmin();
     const history = await Promise.all(

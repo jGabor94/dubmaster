@@ -5,10 +5,6 @@ const protectedRoutes = [
     "/home",
     "/admin",
     "/history",
-    "/sets",
-    "/profile",
-    "/teach",
-    "/class"
 ]
 
 export const authConfig = {
