@@ -11,9 +11,11 @@ export const metadata: Metadata = {
 
 const Layout: FC<{ children: React.ReactNode }> = ({ children }) => (
   <html lang="hu">
-    <body className="antialiased">
-      {children}
-      <ToastProvider />
+    <body className="min-h-screen bg-[#08090d] antialiased">
+      <div className="min-h-screen bg-[#08090d] text-white">
+        {children}
+        <ToastProvider />
+      </div>
     </body>
   </html>
 );

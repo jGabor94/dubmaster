@@ -1,4 +1,3 @@
-import SiteHeader from "@/components/navigation/SiteHeader";
 import AdminEmailList from "@/features/authorization/components/AdminEmailList";
 import { getAllowedGoogleEmails } from "@/features/authorization/dal/queries";
 import { ShieldCheck } from "lucide-react";
@@ -13,7 +12,7 @@ const Page: FC = async () => {
   if (!result.success) redirect(result.error.type === "unauthenticated" ? "/login" : "/");
 
   return <main className="min-h-screen bg-[#08090d] text-white">
-    <SiteHeader active="admin" /><section className="mx-auto w-full max-w-4xl px-6 pb-20 pt-16 lg:px-10">
+    <section className="mx-auto w-full max-w-4xl px-6 pb-20 pt-16 lg:px-10">
       <div className="flex items-center gap-3 text-[#9e85ff]">
         <ShieldCheck className="size-5" />
         <p className="text-xs font-medium uppercase tracking-[0.2em]">Adminisztráció</p>
