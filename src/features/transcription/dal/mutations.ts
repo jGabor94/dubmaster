@@ -25,9 +25,9 @@ function isYoutubeUrl(value: string) {
 
     return Boolean(
       url.searchParams.get("v") ||
-        url.pathname.startsWith("/shorts/") ||
-        url.pathname.startsWith("/embed/") ||
-        url.pathname.startsWith("/live/"),
+      url.pathname.startsWith("/shorts/") ||
+      url.pathname.startsWith("/embed/") ||
+      url.pathname.startsWith("/live/"),
     );
   } catch {
     return false;
