@@ -5,10 +5,29 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth, signIn, signOut } from "@/features/authentication/lib/auth";
 import { FC } from "react";
+import type { Session } from "next-auth";
 
-const AuthControls: FC<{ showGoogleSignIn?: boolean }> = async ({ showGoogleSignIn = false }) => {
+interface AuthControlsProps {
+  session?: Session | null;
+  showGoogleSignIn?: boolean;
+}
 
-  const session = await auth();
+const AuthControls: FC<AuthControlsProps> = async ({ session: providedSession, showGoogleSignIn = false }) => {
+
+  if (showGoogleSignIn) {
+    return (
+      <form action={async () => {
+        "use server";
+        await signIn("google", { redirectTo: "/home" });
+      }}>
+        <button type="submit" className="inline-flex items-center gap-2 text-xs text-white/60 transition-colors hover:text-white">
+          <Image src="/googleButtonLogo.svg" alt="" width={18} height={18} /> Belépés Google-lel
+        </button>
+      </form>
+    );
+  }
+
+  const session = providedSession === undefined ? await auth() : providedSession;
 
   if (!session) {
     if (!showGoogleSignIn) {

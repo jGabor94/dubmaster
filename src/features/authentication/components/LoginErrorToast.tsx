@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
 const errorMessages: Record<string, string> = {
@@ -13,7 +14,9 @@ const errorMessages: Record<string, string> = {
   Verification: "A belépési ellenőrzés sikertelen.",
 };
 
-const LoginErrorToast: FC<{ error?: string }> = ({ error }) => {
+const LoginErrorToast: FC = () => {
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
 
   useEffect(() => {
     if (!error) return;

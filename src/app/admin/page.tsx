@@ -5,6 +5,8 @@ import { ShieldCheck } from "lucide-react";
 import { redirect } from "next/navigation";
 import { FC } from "react";
 
+export const dynamic = "force-dynamic";
+
 const Page: FC = async () => {
   const result = await getAllowedGoogleEmails();
 

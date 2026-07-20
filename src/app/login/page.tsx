@@ -2,14 +2,17 @@ import AuthControls from "@/features/authentication/components/AuthControls";
 import LoginErrorToast from "@/features/authentication/components/LoginErrorToast";
 import { ArrowLeft, AudioLines, LockKeyhole } from "lucide-react";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, Suspense } from "react";
 
-const Page: FC<{ searchParams: Promise<{ error?: string }> }> = async ({ searchParams }) => {
-  const { error } = await searchParams;
+export const dynamic = "force-static";
+
+const Page: FC = () => {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#08090d] px-6 text-white">
-      <LoginErrorToast error={error} />
+      <Suspense fallback={null}>
+        <LoginErrorToast />
+      </Suspense>
       <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center shadow-[0_20px_80px_rgba(95,73,190,0.14)]">
         <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-white text-[#0b0c11]">
           <AudioLines className="size-6" />

@@ -3,6 +3,8 @@ import HeroForm from "@/features/dubbing/components/HeroForm";
 import { Sparkles } from "lucide-react";
 import { FC } from "react";
 
+export const dynamic = "force-dynamic";
+
 const Page: FC = () => {
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#08090d] text-white">

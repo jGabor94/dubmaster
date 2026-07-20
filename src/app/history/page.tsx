@@ -5,6 +5,8 @@ import { ArrowLeft, LockKeyhole } from "lucide-react";
 import Link from "next/link";
 import { FC } from "react";
 
+export const dynamic = "force-dynamic";
+
 const Page: FC = async () => {
   const result = await getDubbingHistory();
 
